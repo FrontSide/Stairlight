@@ -1,137 +1,129 @@
-#include <FastLED.h>
+#include "FastLED.h"
+#include "strip.h"
 
-#define LED_PIN     5
-#define NUM_LEDS    150
-#define BRIGHTNESS  64
-#define LED_TYPE    WS2811
-#define COLOR_ORDER GRB
+#define NUM_LEDS 64
+#define DATA_PIN 5
+
 CRGB leds[NUM_LEDS];
 
-#define UPDATES_PER_SECOND 100
-
-// This example shows several ways to set up and use 'palettes' of colors
-// with FastLED.
-//
-// These compact palettes provide an easy way to re-colorize your
-// animation on the fly, quickly, easily, and with low overhead.
-//
-// USING palettes is MUCH simpler in practice than in theory, so first just
-// run this sketch, and watch the pretty lights as you then read through
-// the code.  Although this sketch has eight (or more) different color schemes,
-// the entire sketch compiles down to about 6.5K on AVR.
-//
-// FastLED provides a few pre-configured color palettes, and makes it
-// extremely easy to make up your own color schemes with palettes.
-//
-// Some notes on the more abstract 'theory and practice' of
-// FastLED compact palettes are at the bottom of this file.
-
-
-
-CRGBPalette16 currentPalette;
-TBlendType    currentBlending;
-
-extern CRGBPalette16 myRedWhiteBluePalette;
-extern const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM;
-
-void FillLEDsFromPaletteColors( uint8_t colorIndex)
-{
-    uint8_t brightness = 255;
-    
-    for( int i = 0; i < NUM_LEDS; i++) {
-        leds[i] = ColorFromPalette( currentPalette, colorIndex, brightness, currentBlending);
-        colorIndex += 3;
-    }
-}
-
-// This function sets up a palette of purple and green stripes.
-void SetupPurpleAndGreenPalette()
-{
-    CRGB purple = CHSV( HUE_PURPLE, 255, 255);
-    CRGB black  = CRGB::Black;
-    
-    currentPalette = CRGBPalette16(
-                                   purple, purple,  black,  black,
-                                   purple, purple, black,  black,
-                                   purple, purple,  black,  black,
-                                   purple, purple, black,  black );
-}
-
-
-// There are several different palettes of colors demonstrated here.
-//
-// FastLED provides several 'preset' palettes: RainbowColors_p, RainbowStripeColors_p,
-// OceanColors_p, CloudColors_p, LavaColors_p, ForestColors_p, and PartyColors_p.
-//
-// Additionally, you can manually define your own color palettes, or you can write
-// code that creates color palettes on the fly.  All are shown here.
-
-void ChangePalettePeriodically()
-{
-    uint8_t secondHand = (millis() / 1000) % 60;
-    static uint8_t lastSecond = 99;
-    
-    if( lastSecond != secondHand) {
-        if( secondHand > 0)  { SetupPurpleAndGreenPalette();             currentBlending = LINEARBLEND; }
-    }
-}
-
-
-
-
-
-// Additionl notes on FastLED compact palettes:
-//
-// Normally, in computer graphics, the palette (or "color lookup table")
-// has 256 entries, each containing a specific 24-bit RGB color.  You can then
-// index into the color palette using a simple 8-bit (one byte) value.
-// A 256-entry color palette takes up 768 bytes of RAM, which on Arduino
-// is quite possibly "too many" bytes.
-//
-// FastLED does offer traditional 256-element palettes, for setups that
-// can afford the 768-byte cost in RAM.
-//
-// However, FastLED also offers a compact alternative.  FastLED offers
-// palettes that store 16 distinct entries, but can be accessed AS IF
-// they actually have 256 entries; this is accomplished by interpolating
-// between the 16 explicit entries to create fifteen intermediate palette
-// entries between each pair.
-//
-// So for example, if you set the first two explicit entries of a compact 
-// palette to Green (0,255,0) and Blue (0,0,255), and then retrieved 
-// the first sixteen entries from the virtual palette (of 256), you'd get
-// Green, followed by a smooth gradient from green-to-blue, and then Blue.
-
-
-
-
 void setup() {
-    delay( 3000 ); // power-up safety delay
-    FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
-    FastLED.setBrightness(  BRIGHTNESS );
-    
-    currentPalette = RainbowColors_p;
-    currentBlending = LINEARBLEND;
+
+        //initialise LEDs	
+	FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS); 
+
+}
+
+void loop() {
+
+	light_up(3000);
+	delay(2000);
+	light_down();
+	delay(2000);
+
+}
+
+void set_global_rgb(int red_level, int green_level, int blue_level) {
+
+	if (red_level > 255) {
+		red_level = 255;
+	}
+
+	if (green_level > 255) {
+		green_level = 255;
+	}
+
+	if (blue_level > 255) {
+		blue_level = 255;
+	}
+
+	for (int led_idx=0; led_idx<NUM_LEDS; led_idx++) {
+		leds[led_idx].r = red_level; 
+		leds[led_idx].g = green_level; 
+		leds[led_idx].b = blue_level; 
+	}
+
+	FastLED.show();
+
 }
 
 
-void loop()
-{
-    ChangePalettePeriodically();
-    
-    static uint8_t startIndex = 0;
-    startIndex = startIndex + 1; /* motion speed */
-    
-    FillLEDsFromPaletteColors( startIndex);
-    
-    FastLED.show();
-    FastLED.delay(1000 / UPDATES_PER_SECOND);
+void light_up(int transition_time_mills) {
+
+	int start_red_level = 0;
+	int start_green_level = 0;
+	int start_blue_level = 0;
+
+	int target_red_level = 255;
+	int target_green_level = 255;
+	int target_blue_level = 255;
+
+	int red_level_step_time_mills = 
+		transition_time_mills / (target_red_level - start_red_level);
+	int green_level_step_time_mills = 
+		transition_time_mills / (target_green_level - start_green_level);
+	int blue_level_step_time_mills = 
+		transition_time_mills / (target_blue_level - start_blue_level);
+
+	// Find the highest common factor of the three step times
+	int hfc_step_time = 1;
+
+	// Start with a random step time from above and decrease the number 
+	// until the result of all step times modulo the iteration step time
+	// equals 0. This iteration step time will then be highest common factor.
+	for (int hfc_iter=red_level_step_time_mills;hfc_iter>1;hfc_iter--) {
+	
+		if ((red_level_step_time_mills % hfc_iter == 0) &&
+		    (green_level_step_time_mills % hfc_iter == 0) &&
+	            (blue_level_step_time_mills % hfc_iter == 0)) {
+		    
+			hfc_step_time = hfc_iter;
+			break;
+
+		    }
+
+	}
+
+	//Now that we have a common step time, we need to find out
+	//after how many steps we need to increase the level of each colour channel
+	int red_steps_till_increase = red_level_step_time_mills / hfc_step_time;
+	int green_steps_till_increase = green_level_step_time_mills / hfc_step_time;
+	int blue_steps_till_increase = blue_level_step_time_mills / hfc_step_time;
+
+	int total_step_count = transition_time_mills / hfc_step_time;
+
+	int red_level = start_red_level;
+	int green_level = start_green_level;
+	int blue_level = start_blue_level;
+	for (int step_iter=0; step_iter>total_step_count; step_iter++) {
+	
+		if (step_iter % red_steps_till_increase == 0) {
+			red_level++;
+		}
+
+		if (step_iter % green_steps_till_increase == 0) {
+			green_level++; 
+		}
+		
+		if (step_iter % blue_steps_till_increase == 0) {
+			blue_level++; 
+		}
+
+		
+		set_global_rgb(red_level, green_level, blue_level);
+	
+	}
+
+
 }
 
-void dim() {
+void light_down() {
 
-  
-  
+	for (int led_idx=0; led_idx<NUM_LEDS; led_idx++) {
+	
+		leds[led_idx] = CRGB::Black; 
+
+	}
+
+	FastLED.show();
+
 }
-
-
