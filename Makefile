@@ -8,6 +8,9 @@ BOARD_TAG    = uno
 BOARDS_TXT   = $(ARDUINO_DIR)/hardware/arduino/avr/boards.txt
 ISP_PROG     = usbtiny
 AVRDUDE_OPTS = -v
+MONITOR_PORT = /dev/ttyUSB0
+FORCE_MONITOR_PORT = true
+#MONITOR_BAUDRATE = 115200
 
 ARDUINO_MK_PRESENT := $(call ls Arduino.mk)
 
