@@ -35,3 +35,14 @@ deps:
 
 .PHONY: deploy
 deploy: ispload
+
+.PHONY: test
+test:
+	rm -rf exec_test || true
+	mkdir exec_test
+	cp $(shell ls *.cpp *.h | grep -vP "(^main|^strip)") ./exec_test
+	cp ./test/* ./exec_test
+	cd exec_test && g++ ./*cpp -DTEST -otest
+	@echo -----------------------------------------------------------
+	./exec_test/test
+	

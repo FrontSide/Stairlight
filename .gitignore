@@ -1,2 +1,4 @@
 build-uno/
 Arduino.mk
+exec_test/
+.vscode/
