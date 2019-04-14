@@ -1,5 +1,5 @@
 //Microcontroller and peripheral constants
-#define MOTION_PIN 2
+#define MOTION_PIN 3
 
 //times in milliseconds
 #define TRANSITION_UP_TIME 3000 
