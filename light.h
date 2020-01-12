@@ -1,16 +1,18 @@
 //Microcontroller and peripheral constants
-#define MOTION_PIN 3
+#define MOTION_PIN_UPSTAIRS 4
+#define MOTION_PIN_DOWNSTAIRS 3
+#define CONTROLLER_LED 7
 
 //times in milliseconds
 #define TRANSITION_UP_TIME 3000 
 #define TRANSITION_DOWN_TIME 3000 
-#define STAY_ON_TIME 17000 
-#define AFTER_CYCLE_REST 5000
+#define LIGHTS_ON_DELAY 20000 
+#define BLOCK_MOTION_SENSOR_DELAY 5000
 
 //colour levels
-#define RED_ON_LEVEL 255
-#define GREEN_ON_LEVEL 180
-#define BLUE_ON_LEVEL 180
+#define RED_ON_LEVEL 50
+#define GREEN_ON_LEVEL 50
+#define BLUE_ON_LEVEL 100
 #define MAX_RGB_LEVEL 255
 #define MIN_RGB_LEVEL 0 
 
